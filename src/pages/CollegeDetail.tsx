@@ -8,6 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { getCollegeBySlug } from "@/services/collegeService";
+import AdmissionProcessTable from "@/components/colleges/details/AdmissionProcessTable";
+import CoursesTable from "@/components/colleges/details/CoursesTable";
+import FacilitiesTable from "@/components/colleges/details/FacilitiesTable";
+import PlacementsTable from "@/components/colleges/details/PlacementsTable";
+import RankingsTable from "@/components/colleges/details/RankingsTable";
 
 const CollegeDetail = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -67,29 +72,6 @@ const CollegeDetail = () => {
     { id: "facilities", label: "Facilities" }
   ];
 
-  // Mock data for now - in real app this would come from the database
-  const mockData = {
-    description: "PSG College of Technology, commonly known as PSGCT was established in 1951 as the first private Engineering Institution in Tamil Nadu by G.R. Damodaran. It is affiliated to Anna University and is located in Coimbatore. PSGCT is ranked 63rd position in the Engineering category & 89th position in the Management category by NIRF 2023.",
-    courses: [
-      { name: "BTech", duration: "4 years", eligibility: "Passed 10+2 with PCM", selectionBasis: "TNEA Counselling" },
-      { name: "BSc", duration: "3 years", eligibility: "Passed 10+2 with PCM", selectionBasis: "Merit-based" },
-      { name: "ME", duration: "2 years", eligibility: "Passed B.E. / B.Tech", selectionBasis: "GATE / TANCET + TANCA Counselling" },
-      { name: "MBA", duration: "2 years", eligibility: "Passed bachelor's degree", selectionBasis: "TANCET + TANCA MBA Counselling" }
-    ],
-    rankings: [
-      { agency: "NIRF (Management)", year: "2023", rank: "89" },
-      { agency: "NIRF (Engineering)", year: "2023", rank: "63" }
-    ],
-    placements: {
-      year: "2020",
-      totalPlaced: "1130",
-      engineeringStudents: "842",
-      managementStudents: "194",
-      medianCTCEngineering: "INR 4.20 LPA",
-      medianCTCManagement: "INR 5.80 LPA"
-    }
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <Header onBookingClick={() => setIsBookingModalOpen(true)} />
@@ -97,7 +79,7 @@ const CollegeDetail = () => {
       {/* Hero Section */}
       <div className="relative h-96 bg-gradient-to-r from-blue-900 to-blue-700">
         <img
-          src="https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=1200&h=400&fit=crop"
+          src={college.image_url}
           alt={college.name}
           className="w-full h-full object-cover opacity-30"
         />
@@ -107,7 +89,7 @@ const CollegeDetail = () => {
           <div className="max-w-7xl mx-auto px-4 w-full">
             <div className="flex items-start space-x-6 text-white">
               <img
-                src="https://images.unsplash.com/photo-1459767129954-1b1c1f9b9ace?w=100&h=100&fit=crop"
+                src={college.college_logo }
                 alt={college.name}
                 className="w-24 h-24 rounded-lg bg-white p-2"
               />
@@ -180,149 +162,34 @@ const CollegeDetail = () => {
             {activeTab === "info" && (
               <div className="space-y-8">
                 <div>
-                  <p className="text-gray-700 leading-relaxed">{mockData.description}</p>
+                  <p className="text-gray-700 leading-relaxed">{college.description}</p>
                 </div>
-                
-                <div>
-                  <h3 className="text-2xl font-bold mb-4">Table of Contents</h3>
-                  <div className="bg-blue-50 rounded-lg p-6">
-                    <ol className="space-y-2 text-blue-600">
-                      <li>1. {college.name} Courses Offered</li>
-                      <li>2. {college.name} Admission</li>
-                      <li>3. {college.name} Placements</li>
-                      <li>4. {college.name} Courses Ranking</li>
-                      <li>5. {college.name} Facilities</li>
-                      <li>6. {college.name} Faculty</li>
-                    </ol>
-                  </div>
-                </div>
+                {college.courses && <CoursesTable collegeName={college.name} courses={college.courses} />}
+                {college.admission_process && <AdmissionProcessTable collegeName={college.name} collegeLocation={college.location} admissionProcess={college.admission_process} />}
+                {college.placements && <PlacementsTable collegeName={college.name} placements={college.placements} />}
+                {college.rankings && <RankingsTable collegeName={college.name} rankings={college.rankings} />}
+                <FacilitiesTable collegeName={college.name} facilities={college.facilities} />
               </div>
             )}
 
-            {activeTab === "courses" && (
-              <div>
-                <h3 className="text-2xl font-bold mb-6">{college.name} Courses Offered</h3>
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse border border-gray-300">
-                    <thead>
-                      <tr className="bg-blue-100">
-                        <th className="border border-gray-300 px-4 py-3 text-left">Course Name</th>
-                        <th className="border border-gray-300 px-4 py-3 text-left">Course Details</th>
-                        <th className="border border-gray-300 px-4 py-3 text-left">Selection Basis</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {mockData.courses.map((course, index) => (
-                        <tr key={index} className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}>
-                          <td className="border border-gray-300 px-4 py-3 font-semibold">{course.name}</td>
-                          <td className="border border-gray-300 px-4 py-3">
-                            Duration: {course.duration}<br />
-                            Eligibility: {course.eligibility}
-                          </td>
-                          <td className="border border-gray-300 px-4 py-3">{course.selectionBasis}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+            {activeTab === "courses" && college.courses && (
+              <CoursesTable collegeName={college.name} courses={college.courses} />
             )}
 
-            {activeTab === "rankings" && (
-              <div>
-                <h3 className="text-2xl font-bold mb-6">{college.name} Courses Ranking</h3>
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse border border-gray-300">
-                    <thead>
-                      <tr className="bg-blue-100">
-                        <th className="border border-gray-300 px-4 py-3 text-left">Agency</th>
-                        <th className="border border-gray-300 px-4 py-3 text-left">Year</th>
-                        <th className="border border-gray-300 px-4 py-3 text-left">Rank</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {mockData.rankings.map((ranking, index) => (
-                        <tr key={index} className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}>
-                          <td className="border border-gray-300 px-4 py-3">{ranking.agency}</td>
-                          <td className="border border-gray-300 px-4 py-3">{ranking.year}</td>
-                          <td className="border border-gray-300 px-4 py-3 font-semibold">{ranking.rank}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+            {activeTab === "rankings" && college.rankings && (
+              <RankingsTable collegeName={college.name} rankings={college.rankings} />
             )}
 
             {activeTab === "facilities" && (
-              <div>
-                <h3 className="text-2xl font-bold mb-6">{college.name} Facilities</h3>
-                <div className="space-y-4">
-                  {college.facilities.map((facility, index) => (
-                    <div key={index} className="flex items-start space-x-3">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                      <p className="text-gray-700">{facility}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <FacilitiesTable collegeName={college.name} facilities={college.facilities} />
             )}
 
-            {activeTab === "placements" && (
-              <div>
-                <h3 className="text-2xl font-bold mb-6">{college.name} Placements</h3>
-                <p className="text-gray-700 mb-4">
-                  {college.name} Placements {mockData.placements.year} has been concluded. 
-                  Reputed recruiters visited the campus. A total of {mockData.placements.totalPlaced} students were placed.
-                </p>
-                <div className="space-y-3">
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                    <p>The median CTC stood at {mockData.placements.medianCTCEngineering} for the Engineering students.</p>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                    <p>The median CTC stood at {mockData.placements.medianCTCManagement} for the Management students.</p>
-                  </div>
-                </div>
-              </div>
+            {activeTab === "placements" && college.placements && (
+              <PlacementsTable collegeName={college.name} placements={college.placements} />
             )}
 
-            {activeTab === "admission" && (
-              <div>
-                <h3 className="text-2xl font-bold mb-6">{college.name} Admission</h3>
-                <p className="text-gray-700 mb-6">
-                  Admissions are based on entrances and counselling conducted by Anna University or national-level exams. 
-                  There are also merit-based admissions for specific courses based on previous exam scores.
-                </p>
-                
-                <div className="space-y-6">
-                  <div>
-                    <h4 className="text-xl font-semibold mb-3">Online Application Submission:</h4>
-                    <ul className="space-y-2 text-gray-700">
-                      <li>• Applicants need to visit the official website to register themselves.</li>
-                      <li>• Click on the link to fill out the application form.</li>
-                      <li>• Enter necessary details such as Personal details, Educational qualification & Entrance Score.</li>
-                      <li>• Pay the application fee</li>
-                      <li>• Take a printout of the duly filled application form.</li>
-                    </ul>
-                  </div>
-                  
-                  <div>
-                    <h4 className="text-xl font-semibold mb-3">Offline Application Submission:</h4>
-                    <ul className="space-y-2 text-gray-700">
-                      <li>• Applicants can download the application form.</li>
-                      <li>• Take a printout and fill it in.</li>
-                      <li>• Attach relevant documents and DD and in an envelope mail it to:</li>
-                    </ul>
-                    <div className="mt-3 p-4 bg-gray-50 rounded">
-                      <p className="font-semibold">The Principal,</p>
-                      <p>{college.name},</p>
-                      <p>{college.location}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            {activeTab === "admission" && college.admission_process && (
+              <AdmissionProcessTable collegeName={college.name} collegeLocation={college.location} admissionProcess={college.admission_process} />
             )}
           </div>
 

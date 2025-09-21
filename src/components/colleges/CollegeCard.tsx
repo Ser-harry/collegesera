@@ -27,10 +27,10 @@ const CollegeCard = ({ college }: CollegeCardProps) => {
           )}
           
           <div className="flex items-start space-x-4">
-            {/* College Image */}
+              {/* College Image */}
             <div className="relative">
               <img
-                src="https://images.unsplash.com/photo-1459767129954-1b1c1f9b9ace?w=100&h=100&fit=crop"
+                src={college.college_logo || "https://images.unsplash.com/photo-1459767129954-1b1c1f9b9ace?w=100&h=100&fit=crop"}
                 alt={college.name}
                 className="w-20 h-20 rounded-xl object-cover flex-shrink-0 shadow-md group-hover:shadow-lg transition-shadow duration-300"
               />

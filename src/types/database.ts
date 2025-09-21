@@ -1,10 +1,50 @@
+export interface Course {
+  id: string;
+  college_id: string;
+  name: string;
+  duration: string;
+  eligibility: string;
+  selection_basis: string;
+  created_at: string;
+}
+
+export interface Placement {
+  id: string;
+  college_id: string;
+  year: number;
+  total_placed: number;
+  engineering_students_placed: number;
+  management_students_placed: number;
+  median_ctc_engineering: string;
+  median_ctc_management: string;
+  created_at: string;
+}
+
+export interface Ranking {
+  id: string;
+  college_id: string;
+  agency: string;
+  year: number;
+  rank: string;
+  created_at: string;
+}
+
+export interface AdmissionProcess {
+  id: string;
+  college_id: string;
+  admission_basis: string;
+  online_application_steps: string[];
+  offline_application_steps: string[];
+  updated_at: string;
+}
+
 export interface DatabaseCollege {
   id: string;
   name: string;
   slug: string;
   location: string;
   district: string;
-  type: string; // Changed from union type to string for database compatibility
+  type: string;
   naac_grade?: string;
   established: number;
   website?: string;
@@ -13,12 +53,18 @@ export interface DatabaseCollege {
   homepage_featured: boolean;
   display_order: number;
   image_url?: string;
+  college_logo?: string;
   principal_name?: string;
   email?: string;
   phone?: string;
   address?: string;
   created_at: string;
   updated_at: string;
+  description?: string;
+  courses?: Course[];
+  placements?: Placement[];
+  rankings?: Ranking[];
+  admission_process?: AdmissionProcess;
 }
 
 export interface DatabaseBranch {
@@ -47,7 +93,7 @@ export interface DatabaseAdvertisement {
   image_url: string;
   target_url: string;
   cta_text: string;
-  placement: string; // Changed from union type to string for database compatibility
+  placement: string;
   start_date: string;
   end_date: string;
   is_active: boolean;

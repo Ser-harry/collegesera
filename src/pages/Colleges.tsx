@@ -27,8 +27,15 @@ const Colleges = () => {
     queryFn: getColleges,
   });
 
+  useEffect(() => {
+    if (colleges.length > 0) {
+      console.log("Fetched colleges data:", colleges);
+    }
+  }, [colleges]);
+
   const searchQuery = searchParams.get('search') || '';
   const categoryParam = searchParams.get('category') || '';
+  const fieldParam = searchParams.get('field') || '';
 
   useEffect(() => {
     if (categoryParam) {
@@ -64,15 +71,36 @@ const Colleges = () => {
   const filteredColleges = useMemo(() => {
     return colleges.filter(college => {
       if (selectedCategory !== "all") {
-        const categoryTypeMap: { [key: string]: string } = {
-          "engineering": "Engineering",
-          "medical": "Medical",
-          "mba": "Management",
-          "law": "Law",
-          "arts": "Arts",
-          "commerce": "Commerce"
+        const collegeTypeLower = college.type.toLowerCase();
+        const selectedCategoryLower = selectedCategory.toLowerCase();
+
+        if (selectedCategoryLower === 'mba') {
+          if (collegeTypeLower !== 'management') return false;
+        } else {
+          if (!collegeTypeLower.includes(selectedCategoryLower)) return false;
+        }
+      }
+      
+      if (fieldParam) {
+        const courseFieldMap: { [key: string]: string } = {
+          "cs": "Computer Science",
+          "mechanical": "Mechanical",
+          "electronics": "Electronics",
+          "civil": "Civil",
+          "mbbs": "MBBS",
+          "bds": "BDS",
+          "nursing": "Nursing",
+          "pharmacy": "Pharmacy",
+          "fashion": "Fashion Design",
+          "interior": "Interior Design",
+          "graphic": "Graphic Design",
         };
-        if (college.type !== categoryTypeMap[selectedCategory]) return false;
+        const courseName = courseFieldMap[fieldParam];
+        if (courseName && college.courses) {
+          if (!college.courses.some(course => course.name.includes(courseName))) {
+            return false;
+          }
+        }
       }
 
       if (selectedState !== "all") {
@@ -91,7 +119,7 @@ const Colleges = () => {
 
       return true;
     });
-  }, [colleges, selectedCategory, selectedState, searchQuery]);
+  }, [colleges, selectedCategory, selectedState, searchQuery, fieldParam]);
 
   const collegesToDisplay = useMemo(() => {
     return filteredColleges.slice(0, visibleCollegeCount);

@@ -76,7 +76,7 @@ const CollegeGrid = () => {
                 <CardContent className="p-6">
                   <div className="flex items-start space-x-4 mb-4">
                     <img
-                      src="https://images.unsplash.com/photo-1459767129954-1b1c1f9b9ace?w=100&h=100&fit=crop"
+                      src={college.college_logo || "https://images.unsplash.com/photo-1459767129954-1b1c1f9b9ace?w=100&h=100&fit=crop"}
                       alt={college.name}
                       className="w-16 h-16 rounded-full object-cover"
                     />
@@ -95,21 +95,29 @@ const CollegeGrid = () => {
                     </div>
                     <div>
                       <span className="text-gray-600">Tuition Fees</span>
-                      <p className="font-semibold">-</p>
+                      <p className="font-semibold">
+                        {college.placements && college.placements.length > 0
+                          ? `₹${(
+                              Number(college.placements[0].median_ctc_engineering) / 100000
+                            ).toFixed(2)} LPA`
+                          : "N/A"}
+                      </p>
                     </div>
                     <div>
                       <span className="text-gray-600">No. of Courses</span>
                       <div className="flex items-center">
-                        <span className="font-semibold mr-2">-</span>
-                        <div className="flex items-center">
-                          <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                          <span className="ml-1 text-sm">4</span>
-                        </div>
+                        <span className="font-semibold mr-2">
+                          {college.courses?.length || "N/A"}
+                        </span>
                       </div>
                     </div>
                     <div>
                       <span className="text-gray-600">Ranking</span>
-                      <p className="font-semibold text-orange-500">-</p>
+                      <p className="font-semibold text-orange-500">
+                        {college.rankings && college.rankings.length > 0
+                          ? `#${college.rankings[0].rank}`
+                          : "N/A"}
+                      </p>
                     </div>
                   </div>
 

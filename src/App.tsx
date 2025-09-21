@@ -13,7 +13,6 @@ const queryClient = new QueryClient();
 const Colleges = lazy(() => import("./pages/Colleges"));
 const CollegeDetail = lazy(() => import("./pages/CollegeDetail"));
 const CollegeDetailsDirectory = lazy(() => import("./pages/CollegeDetailsDirectory"));
-const TNEAPredictor = lazy(() => import("./pages/TNEAPredictor"));
 const AboutUs = lazy(() => import("./pages/AboutUs"));
 const ContactUs = lazy(() => import("./pages/ContactUs"));
 const Articles = lazy(() => import("./pages/Articles"));
@@ -36,7 +35,6 @@ function AppContent() {
                 <Route path="/colleges" element={<Colleges />} />
                 <Route path="/college/:slug" element={<CollegeDetail />} />
                 <Route path="/college-directory" element={<CollegeDetailsDirectory />} />
-                <Route path="/tnea-predictor" element={<TNEAPredictor />} />
                 <Route path="/about" element={<AboutUs />} />
                 <Route path="/contact" element={<ContactUs />} />
                 <Route path="/articles" element={<Articles />} />

@@ -1,69 +1,93 @@
-import { colleges as collegeData, College } from '../../collegeData'; // Import from collegeData.ts
-import { DatabaseCollege, DatabaseBranch, DatabaseCutoffData } from "@/types/database";
+import { createClient } from '@supabase/supabase-js';
+import { DatabaseCollege, DatabaseBranch, DatabaseCutoffData, Course, Placement, Ranking, AdmissionProcess } from "@/types/database";
 import { sanitizeInput, isValidSlug } from "@/utils/security";
 
-// Helper function to transform College data to DatabaseCollege format
-const transformCollegeToDatabaseCollege = (college: College): DatabaseCollege => {
-  const district = college.location.split(',')[0].trim(); // Extract district from location
-  // Generate slug: lowercase, replace spaces with hyphens, remove non-alphanumeric characters except hyphens
-  const slug = college.name
-    .toLowerCase()
-    .replace(/\s+/g, '-') // Replace spaces with hyphens
-    .replace(/[^\w-]+/g, ''); // Remove all non-word chars except hyphens
+// Supabase configuration
+const supabaseUrl = 'https://gsvxhqxuxwanujktjjys.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzdnhocXh1eHdhbnVqa3RqanlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc4Njc0MTUsImV4cCI6MjA3MzQ0MzQxNX0.I0qH3PkGB4_P2XK5IoXNpiRWGuS68qtQIuHAFT7bp_c';
 
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+// Helper function to map Supabase data to DatabaseCollege interface
+// Note: Supabase returns data in snake_case by default, so we map it to camelCase
+const mapSupabaseCollegeToDatabaseCollege = (college: any): DatabaseCollege => {
   return {
     id: college.id,
     name: college.name,
-    slug: slug,
+    slug: college.slug,
     location: college.location,
-    district: district,
-    type: college.type, // Assuming type mapping is direct or handled by frontend
-    naac_grade: "N/A", // Default value as per user input
+    district: college.district,
+    type: college.type,
+    naac_grade: college.naac_grade,
     established: college.established,
-    website: college.contact?.website || null,
+    website: college.website,
     facilities: college.facilities,
-    featured: false, // Default value as per user input
-    homepage_featured: false, // Default value
-    display_order: 0, // Default value
-    image_url: college.image,
-    principal_name: null, // Default value
-    email: college.contact?.email || null,
-    phone: college.contact?.phone || null,
-    address: college.contact?.address || null,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    featured: college.featured,
+    homepage_featured: college.homepage_featured,
+    display_order: college.display_order,
+    image_url: college.image_url,
+    college_logo: college.college_logo, // Mapped college_logo
+    principal_name: college.principal_name,
+    email: college.email,
+    phone: college.phone,
+    address: college.address,
+    description: college.description,
+    created_at: college.created_at,
+    updated_at: college.updated_at,
+    courses: college.courses,
+    placements: college.placements,
+    rankings: college.rankings,
+    admission_process: college.admission_process,
   };
 };
 
 export async function getColleges(): Promise<DatabaseCollege[]> {
   try {
-    // Transform collegeData to DatabaseCollege format
-    const transformedColleges = collegeData.map(transformCollegeToDatabaseCollege);
-    return transformedColleges;
-  } catch (error) {
-    console.error('Service error in getColleges:', error);
+    const { data, error } = await supabase
+      .from('colleges')
+      .select('*, courses(*), placements(*), rankings(*)');
+
+    if (error) throw error;
+    if (!data) return [];
+
+    // Map Supabase data to DatabaseCollege interface
+    return data.map(mapSupabaseCollegeToDatabaseCollege);
+  } catch (error: any) {
+    console.error('Service error in getColleges:', error.message);
     throw error;
   }
 }
 
 export async function getFeaturedColleges(): Promise<DatabaseCollege[]> {
   try {
-    const allColleges = await getColleges(); // Get transformed data
-    const featuredColleges = allColleges.filter(college => college.featured);
-    return featuredColleges;
-  } catch (error) {
-    console.error('Service error in getFeaturedColleges:', error);
+    const { data, error } = await supabase
+      .from('colleges')
+      .select('*')
+      .eq('featured', true);
+
+    if (error) throw error;
+    if (!data) return [];
+
+    return data.map(mapSupabaseCollegeToDatabaseCollege);
+  } catch (error: any) {
+    console.error('Service error in getFeaturedColleges:', error.message);
     throw error;
   }
 }
 
 export async function getHomepageFeaturedColleges(): Promise<DatabaseCollege[]> {
   try {
-    const allColleges = await getColleges(); // Get transformed data
-    const homepageFeaturedColleges = allColleges.filter(college => college.homepage_featured);
-    return homepageFeaturedColleges;
-  } catch (error) {
-    console.error('Service error in getHomepageFeaturedColleges:', error);
+    const { data, error } = await supabase
+      .from('colleges')
+      .select('*')
+      .eq('homepage_featured', true);
+
+    if (error) throw error;
+    if (!data) return [];
+
+    return data.map(mapSupabaseCollegeToDatabaseCollege);
+  } catch (error: any) {
+    console.error('Service error in getHomepageFeaturedColleges:', error.message);
     throw error;
   }
 }
@@ -78,48 +102,79 @@ export async function getCollegeBySlug(slug: string): Promise<DatabaseCollege | 
 
     const sanitizedSlug = sanitizeInput(slug);
     
-    const allColleges = await getColleges(); // Get transformed data
-    const college = allColleges.find(college => college.slug === sanitizedSlug);
+    const { data, error } = await supabase
+      .from('colleges')
+      .select(`
+        *,
+        courses (*),
+        placements (*),
+        rankings (*),
+        admission_process (*)
+      `)
+      .eq('slug', sanitizedSlug)
+      .single();
 
-    if (!college) {
+    if (error) throw error;
+    if (!data) {
       console.log('No college found for slug:', sanitizedSlug);
       return null;
     }
 
-    return college;
-  } catch (error) {
-    console.error('Service error in getCollegeBySlug:', error);
+    return mapSupabaseCollegeToDatabaseCollege(data);
+  } catch (error: any) {
+    console.error('Service error in getCollegeBySlug:', error.message);
     return null;
   }
 }
 
 export async function getBranches(): Promise<DatabaseBranch[]> {
   try {
-    // Returning an empty array as branch data is not available in college.json
-    return [];
-  } catch (error) {
-    console.error('Service error in getBranches:', error);
+    const { data, error } = await supabase
+      .from('Branches')
+      .select('*');
+
+    if (error) throw error;
+    if (!data) return [];
+
+    // Assuming Supabase returns data compatible with DatabaseBranch or needs mapping
+    // For now, returning as is, assuming structure matches or is handled by frontend
+    return data as DatabaseBranch[]; 
+  } catch (error: any) {
+    console.error('Service error in getBranches:', error.message);
     throw error;
   }
 }
 
 export async function getCutoffData(): Promise<DatabaseCutoffData[]> {
   try {
-    // Returning an empty array as cutoff data is not available in college.json
-    return [];
-  } catch (error) {
-    console.error('Service error in getCutoffData:', error);
+    const { data, error } = await supabase
+      .from('CutoffData')
+      .select('*');
+
+    if (error) throw error;
+    if (!data) return [];
+
+    // Assuming Supabase returns data compatible with DatabaseCutoffData or needs mapping
+    return data as DatabaseCutoffData[];
+  } catch (error: any) {
+    console.error('Service error in getCutoffData:', error.message);
     throw error;
   }
 }
 
 export async function getCutoffDataForCollege(collegeId: string): Promise<DatabaseCutoffData[]> {
   try {
-    // Returning an empty array as cutoff data is not available in college.json
-    console.log(`Fetching cutoff data for collegeId: ${collegeId}`);
-    return [];
-  } catch (error) {
-    console.error('Service error in getCutoffDataForCollege:', error);
+    const { data, error } = await supabase
+      .from('CutoffData')
+      .select('*')
+      .eq('college_id', collegeId);
+
+    if (error) throw error;
+    if (!data) return [];
+
+    return data as DatabaseCutoffData[];
+  } catch (error: any) {
+    console.error('Service error in getCutoffDataForCollege:', error.message);
     return [];
   }
 }

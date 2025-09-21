@@ -19,7 +19,8 @@
     "phone": "123-456-7890",
     "address": "123 University Lane, State City",
     "created_at": "2023-01-01T00:00:00.000Z",
-    "updated_at": "2023-01-01T00:00:00.000Z"
+    "updated_at": "2023-01-01T00:00:00.000Z",
+    "description": "State University is a public institution known for its comprehensive programs and research opportunities. Founded in 1950, it serves the State City region."
   },
   {
     "id": "2",
@@ -41,7 +42,8 @@
     "phone": "098-765-4321",
     "address": "456 Tech Park, Techville",
     "created_at": "2023-01-01T00:00:00.000Z",
-    "updated_at": "2023-01-01T00:00:00.000Z"
+    "updated_at": "2023-01-01T00:00:00.000Z",
+    "description": "Tech Institute is a leading private institution established in 1980, offering advanced technological education and fostering innovation in Techville."
   },
   {
     "id": "3",
@@ -63,6 +65,29 @@
     "phone": "555-555-5555",
     "address": "789 College Avenue, Artsburg",
     "created_at": "2023-01-01T00:00:00.000Z",
-    "updated_at": "2023-01-01T00:00:00.000Z"
+    "updated_at": "2023-01-01T00:00:00.000Z",
+    "description": "Liberal Arts College, founded in 1920, is a private institution in Artsburg dedicated to a broad education in humanities and sciences."
+  }, 
+  {
+    "id": "2",
+    "name": "PSG College of Technology",
+    "slug": "psg-college-of-technology",
+    "location": "Coimbatore",
+    "district": "Coimbatore",
+    "type": "Private",
+    "naac_grade": "A",
+    "established": 1951,
+    "website": "https://www.psgtech.edu/",
+    "facilities": ["Library", "Computer Labs", "Sports Facilities", "Placement Cell"],
+    "featured": true,
+    "homepage_featured": false,
+    "display_order": 2,
+    "image_url": "https://example.com/images/psg_tech.jpg",
+    "principal_name": "Dr. G. Shanmugam",
+    "email": "principal@psgtech.edu",
+    "phone": "0422-4304400",
+    "address": "Peelamedu, Coimbatore - 641004",
+    "description": "PSG College of Technology, founded in 1951, is a leading self-financing institution in Coimbatore, known for its strong industry connections and placement record."
   }
+  
 ]
