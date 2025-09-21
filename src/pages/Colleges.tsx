@@ -71,7 +71,7 @@ const Colleges = () => {
   const filteredColleges = useMemo(() => {
     return colleges.filter(college => {
       if (selectedCategory !== "all") {
-        const collegeTypeLower = college.type.toLowerCase();
+        const collegeTypeLower = college.type_collwge.toLowerCase();
         const selectedCategoryLower = selectedCategory.toLowerCase();
 
         if (selectedCategoryLower === 'mba') {

@@ -45,6 +45,7 @@ export interface DatabaseCollege {
   location: string;
   district: string;
   type: string;
+  type_collwge: string; // Added this line
   naac_grade?: string;
   established: number;
   website?: string;
