@@ -11,13 +11,14 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 // Helper function to map Supabase data to DatabaseCollege interface
 // Note: Supabase returns data in snake_case by default, so we map it to camelCase
 const mapSupabaseCollegeToDatabaseCollege = (college: any): DatabaseCollege => {
-  return {
+    return {
     id: college.id,
     name: college.name,
     slug: college.slug,
     location: college.location,
     district: college.district,
     type: college.type,
+    type_collwge: college.type_collwge, // Added mapping for the new field
     naac_grade: college.naac_grade,
     established: college.established,
     website: college.website,
